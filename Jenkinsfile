@@ -4,19 +4,19 @@ pipeline {
         maven 'Maven_3_5_2'  
     }
    stages{
-    stage('CompileandRunSonarAnalysis') {
-            steps {	
-		sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=tech365webapp -Dsonar.organization=tech365webapp -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=ce9288e0a286035c47ba33b666be5a1c77ded786'
-			}
-    }
+//     stage('CompileandRunSonarAnalysis') {
+//             steps {	
+// 		sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=tech365webapp -Dsonar.organization=tech365webapp -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=ce9288e0a286035c47ba33b666be5a1c77ded786'
+// 			}
+//     }
 
-	stage('RunSCAAnalysisUsingSnyk') {
-            steps {		
-				withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
-					sh 'mvn snyk:test -fn'
-				}
-			}
-    }
+// 	stage('RunSCAAnalysisUsingSnyk') {
+//             steps {		
+// 				withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
+// 					sh 'mvn snyk:test -fn'
+// 				}
+// 			}
+//     }
 
 	stage('Build') { 
             steps { 
@@ -31,21 +31,23 @@ pipeline {
 	stage('Push') {
             steps {
                 script{
-                    docker.withRegistry('https://601136829775.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') {
+                    docker.withRegistry('"https://601136829775.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials"') 
+// 			docker.withRegistry('https://601136829775.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') 
+			{
                     app.push("latest")
                     }
                 }
             }
     	}
 	   
-	stage('Kubernetes Deployment of Tech365 Web Application') {
-	   steps {
-	      withKubeConfig([credentialsId: 'kubelogin']) {
-		  sh('kubectl delete all --all -n devsecops')
-		  sh ('kubectl apply -f deployment.yaml --namespace=devsecops')
-		}
-	      }
-   	}
+// 	stage('Kubernetes Deployment of Tech365 Web Application') {
+// 	   steps {
+// 	      withKubeConfig([credentialsId: 'kubelogin']) {
+// 		  sh('kubectl delete all --all -n devsecops')
+// 		  sh ('kubectl apply -f deployment.yaml --namespace=devsecops')
+// 		}
+// 	      }
+//    	}
 	   
 // 	stage ('wait_for_testing'){
 // 	   steps {
